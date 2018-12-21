@@ -10,7 +10,7 @@
 KnobMonitor::KnobMonitor()
 {
 	basicShader = compileShader("./shaders/basic.vert", "./shaders/basic.frag");
-	createTriangle();
+	createGeometry();
 }
 
 
@@ -20,14 +20,15 @@ KnobMonitor::~KnobMonitor()
 
 void KnobMonitor::update()
 {
-	updateTriangle();
+	updateGeometry();
 }
 
 void KnobMonitor::draw()
 {
 	glUseProgram(basicShader);
-	glBindVertexArray(triangleVao);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	 glBindVertexArray(quadVao);
+	// glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
 	check_gl_error();
 }
@@ -88,75 +89,60 @@ GLuint KnobMonitor::compileShader(std::string vertexFilePath, std::string fragme
 	return program;
 }
 
-void KnobMonitor::createTriangle()
+void KnobMonitor::createGeometry()
 {
-	// float positions[] = {
-	// 	0.0f,  0.5f,  0.0f,
-	// 	0.5f, -0.5f,  0.0f,
-	// 	-0.5f, -0.5f,  0.0f
-	// };
+	glGenVertexArrays(1, &quadVao);
+	glBindVertexArray(quadVao);
+	glGenBuffers(1, &quadVertsBuffer);
+	glGenBuffers(1, &quadColorsBuffer);
+	glGenBuffers(1, &quadIndicesBuffer);
 
-	triangleVerts[0] = glm::vec3(0.0f, 0.5f, 0.0f);
-	triangleVerts[1] = glm::vec3(0.5f, -0.5f, 0.0f);
-	triangleVerts[2] = glm::vec3(-0.5f, -0.5f, 0.0f);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quadIndicesBuffer);
 
-	float colors[] = {
-		1.0f, 0.0f,  0.0f,
-		0.0f, 1.0f,  0.0f,
-		0.0f, 0.0f,  1.0f
-	};
+	glBindBuffer(GL_ARRAY_BUFFER, quadVertsBuffer);
+	GLint posAttrib = glGetAttribLocation(basicShader, "PositionAttribute");
+	glEnableVertexAttribArray(posAttrib);
+	glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-	triangleVertsVbo = 0;
-	glGenBuffers(1, &triangleVertsVbo);
-	// glBindBuffer(GL_ARRAY_BUFFER, triangleVertsVbo);
-	// glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), triangleVerts, GL_DYNAMIC_DRAW);
-
-	GLuint colors_vbo = 0;
-	glGenBuffers(1, &colors_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
-	glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), colors, GL_STATIC_DRAW);
-
-	triangleVao = 0;
-	glGenVertexArrays(1, &triangleVao);
-	glBindVertexArray(triangleVao);
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, triangleVertsVbo);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-	glEnableVertexAttribArray(1);
-	glBindBuffer(GL_ARRAY_BUFFER, colors_vbo);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+	glBindBuffer(GL_ARRAY_BUFFER, quadColorsBuffer);
+	GLint colAttrib = glGetAttribLocation(basicShader, "ColorAttribute");
+	glEnableVertexAttribArray(colAttrib);
+	glVertexAttribPointer(colAttrib, 4, GL_FLOAT, GL_FALSE, 0, 0);
 }
 
-void KnobMonitor::updateTriangle()
+void KnobMonitor::updateGeometry()
 {
-	// float angleA = Knobs::get(3, -PI2);
-	// float angleB = angleA + PI / 2;
-	// float angleC = angleB + PI / 2;
-	//
-	// triangleVerts[0] = glm::vec3(glm::cos(angleA), glm::sin(angleA), 0.0f);
-	// triangleVerts[1] = glm::vec3(glm::cos(angleB), glm::sin(angleB), 0.0f);
-	// triangleVerts[2] = glm::vec3(glm::cos(angleC), glm::sin(angleC), 0.0f);
-	//
-	// glBindBuffer(GL_ARRAY_BUFFER, triangleVertsVbo);
-	// glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), triangleVerts, GL_DYNAMIC_DRAW);
-
 	float angleA = Knobs::get(3, -PI2);
 	float angleB = angleA + PI / 2;
 	float angleC = angleB + PI / 2;
 	float angleD = angleC + PI / 2;
 
-	quadVerts[0] = glm::vec3(glm::cos(angleA), glm::sin(angleA), 0.0f);
-	quadVerts[1] = glm::vec3(glm::cos(angleB), glm::sin(angleB), 0.0f);
-	quadVerts[2] = glm::vec3(glm::cos(angleC), glm::sin(angleC), 0.0f);
-	quadVerts[3] = glm::vec3(glm::cos(angleD), glm::sin(angleD), 0.0f);
+	quadVerts.clear();
+	quadVerts.push_back(glm::vec3(glm::cos(angleA), glm::sin(angleA), 0.0f));
+	quadVerts.push_back(glm::vec3(glm::cos(angleB), glm::sin(angleB), 0.0f));
+	quadVerts.push_back(glm::vec3(glm::cos(angleC), glm::sin(angleC), 0.0f));
+	quadVerts.push_back(glm::vec3(glm::cos(angleD), glm::sin(angleD), 0.0f));
+	
+	quadColors.clear();
+	quadColors.push_back(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+	quadColors.push_back(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+	quadColors.push_back(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
+	quadColors.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	
+	quadIndices.clear();
+	quadIndices.push_back(0);
+	quadIndices.push_back(1);
+	quadIndices.push_back(2);
+	quadIndices.push_back(0);
+	quadIndices.push_back(2);
+	quadIndices.push_back(3);
 
-	quadIndices[0] = 0;
-	quadIndices[1] = 1;
-	quadIndices[2] = 2;
-	quadIndices[3] = 0;
-	quadIndices[4] = 2;
-	quadIndices[5] = 3;
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quadIndicesBuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, quadIndices.size() * sizeof(GLuint), &quadIndices[0], GL_DYNAMIC_DRAW);
 
-	glBindBuffer(GL_ARRAY_BUFFER, triangleVertsVbo);
-	glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(float), quadVerts, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, quadVertsBuffer);
+	glBufferData(GL_ARRAY_BUFFER, quadVerts.size() * sizeof(glm::vec3), &quadVerts[0], GL_DYNAMIC_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, quadColorsBuffer);
+	glBufferData(GL_ARRAY_BUFFER, quadColors.size() * sizeof(glm::vec4), &quadColors[0], GL_DYNAMIC_DRAW);
 }

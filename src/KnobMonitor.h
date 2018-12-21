@@ -18,17 +18,16 @@ public:
 
 private:
 	float dt;
-	glm::vec3* quadVerts = new glm::vec3[4];
-	GLuint* quadIndices = new GLuint[4];
-	GLuint quadVertsBuffer, quadIndicesBuffer, quadVao;
+	std::vector<glm::vec3> quadVerts;
+	std::vector<glm::vec4> quadColors;
+	std::vector<GLuint> quadIndices;
+	GLuint quadVertsBuffer, quadColorsBuffer, quadIndicesBuffer, quadVao;
 
-	glm::vec3* triangleVerts = new glm::vec3[3];
-	GLuint triangleVertsVbo, triangleVao;
 	GLuint basicShader;
 
 	GLuint compileShader(std::string filePath, GLenum shaderType);
 	GLuint compileShader(std::string vertexFilePath, std::string fragmentFilePath);
-	void createTriangle();
-	void updateTriangle();
+	void createGeometry();
+	void updateGeometry();
 };
 
