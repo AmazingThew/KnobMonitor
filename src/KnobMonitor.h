@@ -29,5 +29,8 @@ private:
 	GLuint compileShader(std::string vertexFilePath, std::string fragmentFilePath);
 	void createGeometry();
 	void updateGeometry();
+
+	void appendArc(std::vector<glm::vec3>* vertices, std::vector<GLuint>* indices, std::vector<glm::vec4>* colors, glm::vec4 startColor, glm::vec4 endColor, glm::vec3 center, float radius, float width, int resolution, float startAngle, float subtense);
+	void appendLine(std::vector<glm::vec3>* vertices, std::vector<GLuint>* indices, std::vector<glm::vec4>* colors, glm::vec4 startColor, glm::vec4 endColor, glm::vec3 start, glm::vec3 end, float width);
 };
 

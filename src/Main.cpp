@@ -14,6 +14,11 @@ void error_callback(int error, const char* description)
 	fprintf(stderr, "ERROR: %s\n", description);
 }
 
+void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+{
+	glViewport(0, 0, width, height);
+}
+
 int main() {
 	glfwSetErrorCallback(error_callback);
 
@@ -31,12 +36,14 @@ int main() {
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+	glfwWindowHint(GLFW_SAMPLES, 8);
 	GLFWwindow* window = glfwCreateWindow(1024, 1024, "Knob Monitor", NULL, NULL);
 	if (!window) {
 		fprintf(stderr, "ERROR: could not open window with GLFW3\n");
 		glfwTerminate();
 		return 1;
 	}
+	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetWindowAspectRatio(window, 1, 1);
 	glfwMakeContextCurrent(window);
 

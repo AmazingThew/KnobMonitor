@@ -9,6 +9,7 @@
 
 KnobMonitor::KnobMonitor()
 {
+	// basicShader = compileShader("D:\\Development\\C++\\KnobMonitor\\KnobMonitor\\shaders\\basic.vert", "D:\\Development\\C++\\KnobMonitor\\KnobMonitor\\shaders\\basic.frag");
 	basicShader = compileShader("./shaders/basic.vert", "./shaders/basic.frag");
 	createGeometry();
 }
@@ -27,8 +28,7 @@ void KnobMonitor::draw()
 {
 	glUseProgram(basicShader);
 	 glBindVertexArray(quadVao);
-	// glDrawArrays(GL_TRIANGLES, 0, 3);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, quadIndices.size(), GL_UNSIGNED_INT, 0);
 
 	check_gl_error();
 }
@@ -68,7 +68,7 @@ GLuint KnobMonitor::compileShader(std::string filePath, GLenum shaderType)
 	}
 	else
 	{
-		fprintf(stderr, "Failed to load shader file at %s", filePath.c_str());
+		fprintf(stderr, "Failed to load shader file at %s\n", filePath.c_str());
 		return -1;
 	}
 }
@@ -112,30 +112,25 @@ void KnobMonitor::createGeometry()
 
 void KnobMonitor::updateGeometry()
 {
-	float angleA = Knobs::get(3, -PI2);
-	float angleB = angleA + PI / 2;
-	float angleC = angleB + PI / 2;
-	float angleD = angleC + PI / 2;
-
 	quadVerts.clear();
-	quadVerts.push_back(glm::vec3(glm::cos(angleA), glm::sin(angleA), 0.0f));
-	quadVerts.push_back(glm::vec3(glm::cos(angleB), glm::sin(angleB), 0.0f));
-	quadVerts.push_back(glm::vec3(glm::cos(angleC), glm::sin(angleC), 0.0f));
-	quadVerts.push_back(glm::vec3(glm::cos(angleD), glm::sin(angleD), 0.0f));
-	
-	quadColors.clear();
-	quadColors.push_back(glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
-	quadColors.push_back(glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-	quadColors.push_back(glm::vec4(0.0f, 0.0f, 1.0f, 1.0f));
-	quadColors.push_back(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
-	
 	quadIndices.clear();
-	quadIndices.push_back(0);
-	quadIndices.push_back(1);
-	quadIndices.push_back(2);
-	quadIndices.push_back(0);
-	quadIndices.push_back(2);
-	quadIndices.push_back(3);
+	quadColors.clear();
+
+	glm::vec4 startColor = glm::vec4(0, 0, 1, 1);
+	glm::vec4 endColor = glm::vec4(1, 0, 0, 1);
+	glm::vec3 center = glm::vec3(0, 0, 0);
+	float radius = 0.25f;
+	int resolution = 128;
+	float width = Knobs::get(2);
+	float startAngle = 0;
+	float subtense = Knobs::get(3, PI2);
+
+	appendArc(&quadVerts, &quadIndices, &quadColors, startColor, endColor, center, radius, width, resolution, startAngle, subtense);
+
+	float lineAngle = Knobs::get(7, PI2);
+	float lineLength = Knobs::get(6);
+	float lineWidth = Knobs::get(5);
+	appendLine(&quadVerts, &quadIndices, &quadColors, startColor, endColor, glm::vec3(0, 0, 0), glm::vec3(glm::cos(lineAngle), glm::sin(lineAngle), 0)*lineLength, lineWidth);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quadIndicesBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, quadIndices.size() * sizeof(GLuint), &quadIndices[0], GL_DYNAMIC_DRAW);
@@ -145,4 +140,66 @@ void KnobMonitor::updateGeometry()
 
 	glBindBuffer(GL_ARRAY_BUFFER, quadColorsBuffer);
 	glBufferData(GL_ARRAY_BUFFER, quadColors.size() * sizeof(glm::vec4), &quadColors[0], GL_DYNAMIC_DRAW);
+}
+
+void KnobMonitor::appendArc(std::vector<glm::vec3>* vertices, std::vector<GLuint>* indices, std::vector<glm::vec4>* colors,
+	glm::vec4 startColor, glm::vec4 endColor, glm::vec3 center, float radius, float width, int resolution, float startAngle, float subtense)
+{
+	int totalVerts = vertices->size();
+	for (int i = 0; i<resolution - 1; i++)
+	{
+		int startIndex = totalVerts + i * 2;
+		indices->push_back(startIndex + 0);
+		indices->push_back(startIndex + 3);
+		indices->push_back(startIndex + 2);
+		indices->push_back(startIndex + 3);
+		indices->push_back(startIndex + 0);
+		indices->push_back(startIndex + 1);
+	}
+
+	float angleStep = subtense / (resolution - 1);
+	for (int i=0; i<resolution; i++)
+	{
+		float angle = angleStep * i + startAngle;
+		vertices->push_back(glm::vec3(
+			glm::cos(angle) * (radius - width / 2) + center.x,
+			glm::sin(angle) * (radius - width / 2) + center.y,
+			center.z
+		));
+		vertices->push_back(glm::vec3(
+			glm::cos(angle) * (radius + width / 2) + center.x,
+			glm::sin(angle) * (radius + width / 2) + center.y,
+			center.z
+		));
+
+		float colorInterpolant = (float)i / (resolution - 1);
+		colors->push_back(glm::mix(startColor, endColor, colorInterpolant));
+		colors->push_back(glm::mix(startColor, endColor, colorInterpolant));
+	}
+}
+
+void KnobMonitor::appendLine(std::vector<glm::vec3>* vertices, std::vector<GLuint>* indices,
+	std::vector<glm::vec4>* colors, glm::vec4 startColor, glm::vec4 endColor, glm::vec3 start, glm::vec3 end, float width)
+{
+	glm::vec2 segment = end - start;
+	glm::vec2 direction = glm::normalize(segment);
+	glm::vec3 ortho = glm::vec3(-direction.y, direction.x, 0) * width / 2.0f;
+
+	int startIndex = vertices->size();
+	indices->push_back(startIndex + 0);
+	indices->push_back(startIndex + 2);
+	indices->push_back(startIndex + 3);
+	indices->push_back(startIndex + 0);
+	indices->push_back(startIndex + 1);
+	indices->push_back(startIndex + 2);
+
+	vertices->push_back(glm::vec3(start+ortho));
+	vertices->push_back(glm::vec3(start-ortho));
+	vertices->push_back(glm::vec3(end-ortho));
+	vertices->push_back(glm::vec3(end+ortho));
+
+	colors->push_back(startColor);
+	colors->push_back(startColor);
+	colors->push_back(endColor);
+	colors->push_back(endColor);
 }
