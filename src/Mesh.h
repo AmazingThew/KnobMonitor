@@ -11,7 +11,7 @@ public:
 	~Mesh();
 
 	void clear();
-	void update();
+	void apply();
 	void draw(GLuint shader);
 
 	std::vector<glm::vec3> vertices;

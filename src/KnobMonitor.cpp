@@ -12,29 +12,30 @@ KnobMonitor::KnobMonitor()
 	// basicShader = compileShader("D:\\Development\\C++\\KnobMonitor\\KnobMonitor\\shaders\\basic.vert", "D:\\Development\\C++\\KnobMonitor\\KnobMonitor\\shaders\\basic.frag");
 	basicShader = compileShader("./shaders/basic.vert", "./shaders/basic.frag");
 
-	mesh = new Mesh();
+	dialMesh = new Mesh();
+	gaugeMesh = new Mesh();
+	appendGauge(gaugeMesh, glm::vec3(0, 0, 0), 1);
+	gaugeMesh->apply();
 }
 
 
 KnobMonitor::~KnobMonitor()
 {
-	delete mesh;
+	delete gaugeMesh;
+	delete dialMesh;
 }
 
 void KnobMonitor::update()
 {
-	mesh->clear();
-
-	float scale = Knobs::get(7);
-	appendGauge(mesh, glm::vec3(0, 0, 0), scale);
-	appendDial(mesh, glm::vec3(0, 0, 0), scale, Knobs::get(3));
-
-	mesh->update();
+	dialMesh->clear();
+	appendDial(dialMesh, glm::vec3(0, 0, 0), Knobs::get(7), Knobs::get(3));
+	dialMesh->apply();
 }
 
 void KnobMonitor::draw()
 {
-	mesh->draw(basicShader);
+	gaugeMesh->draw(basicShader);
+	dialMesh->draw(basicShader);
 }
 
 GLuint KnobMonitor::compileShader(std::string filePath, GLenum shaderType)

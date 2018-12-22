@@ -35,8 +35,10 @@ void Mesh::clear()
 	indices.clear();
 }
 
-void Mesh::update()
+void Mesh::apply()
 {
+	glBindVertexArray(vao);
+
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(GLuint), &indices[0], GL_DYNAMIC_DRAW);
 

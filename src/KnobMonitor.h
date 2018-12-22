@@ -30,7 +30,8 @@ private:
 	int numTicks = 17;
 	int resolution = 64;
 
-	Mesh* mesh;
+	Mesh* gaugeMesh;
+	Mesh* dialMesh;
 
 	GLuint basicShader;
 
