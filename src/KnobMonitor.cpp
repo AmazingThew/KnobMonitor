@@ -116,21 +116,25 @@ void KnobMonitor::updateGeometry()
 	quadIndices.clear();
 	quadColors.clear();
 
-	glm::vec4 startColor = glm::vec4(0, 0, 1, 1);
-	glm::vec4 endColor = glm::vec4(1, 0, 0, 1);
-	glm::vec3 center = glm::vec3(0, 0, 0);
-	float radius = 0.25f;
-	int resolution = 128;
-	float width = Knobs::get(2);
-	float startAngle = 0;
-	float subtense = Knobs::get(3, PI2);
+	// glm::vec4 startColor = glm::vec4(0, 0, 1, 1);
+	// glm::vec4 endColor = glm::vec4(1, 0, 0, 1);
+	// glm::vec3 center = glm::vec3(0, 0, 0);
+	// float radius = 0.25f;
+	// int resolution = 128;
+	// float width = Knobs::get(2);
+	// float startAngle = 0;
+	// float subtense = Knobs::get(3, PI2);
+	//
+	// appendArc(&quadVerts, &quadIndices, &quadColors, startColor, endColor, center, radius, width, resolution, startAngle, subtense);
+	//
+	// float lineAngle = Knobs::get(7, PI2);
+	// float lineLength = Knobs::get(6);
+	// float lineWidth = Knobs::get(5);
+	// appendLine(&quadVerts, &quadIndices, &quadColors, startColor, endColor, glm::vec3(0, 0, 0), glm::vec3(glm::cos(lineAngle), glm::sin(lineAngle), 0)*lineLength, lineWidth);
 
-	appendArc(&quadVerts, &quadIndices, &quadColors, startColor, endColor, center, radius, width, resolution, startAngle, subtense);
-
-	float lineAngle = Knobs::get(7, PI2);
-	float lineLength = Knobs::get(6);
-	float lineWidth = Knobs::get(5);
-	appendLine(&quadVerts, &quadIndices, &quadColors, startColor, endColor, glm::vec3(0, 0, 0), glm::vec3(glm::cos(lineAngle), glm::sin(lineAngle), 0)*lineLength, lineWidth);
+	float scale = Knobs::get(7);
+	appendGauge(&quadVerts, &quadIndices, &quadColors, glm::vec3(0, 0, 0), scale);
+	appendDial(&quadVerts, &quadIndices, &quadColors, glm::vec3(0, 0, 0), scale, Knobs::get(3));
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quadIndicesBuffer);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, quadIndices.size() * sizeof(GLuint), &quadIndices[0], GL_DYNAMIC_DRAW);
@@ -140,6 +144,46 @@ void KnobMonitor::updateGeometry()
 
 	glBindBuffer(GL_ARRAY_BUFFER, quadColorsBuffer);
 	glBufferData(GL_ARRAY_BUFFER, quadColors.size() * sizeof(glm::vec4), &quadColors[0], GL_DYNAMIC_DRAW);
+}
+
+void KnobMonitor::appendGauge(std::vector<glm::vec3>* vertices, std::vector<GLuint>* indices, std::vector<glm::vec4>* colors, glm::vec3 center, float scale)
+{
+	glm::vec4 color = white;
+
+
+	float radius = baseKnobRadius * scale;
+	float width = baseDialWidth * scale;
+
+	float tickRadius = radius + width * ringPadding;
+	float tickLength = width * ringPadding;
+	float tickWidth = 0.03f;
+	float thinTickWidth = 0.005f;
+
+	appendArc(vertices, indices, colors, color, color, center, tickRadius, arcWidth, resolution, -PI / 2.0f - deadSplit / 2.0f, -(PI2 - deadSplit));
+
+	float tickSplit = -(PI2 - deadSplit) / (numTicks - 1);
+	for (int i = 0; i < numTicks; i++)
+	{
+		float angle = -PI / 2 - deadSplit / 2 + tickSplit * i;
+		float length = i % 2 == 0 ? tickLength : tickLength * 0.5f;
+		float tickLineWidth = i % 4 == 0 ? tickWidth : thinTickWidth;
+		glm::vec3 start = center + glm::vec3(glm::cos(angle), glm::sin(angle), 0) * tickRadius;
+		glm::vec3 end = center + glm::vec3(glm::cos(angle), glm::sin(angle), 0) * (tickRadius+length);
+
+		appendLine(vertices, indices, colors, color, color, start, end, tickLineWidth);
+	}
+}
+
+void KnobMonitor::appendDial(std::vector<glm::vec3>* vertices, std::vector<GLuint>* indices, std::vector<glm::vec4>* colors, glm::vec3 center, float scale, float progress)
+{
+	glm::vec4 color = red;
+
+	float radius = baseKnobRadius * scale;
+	float width = baseDialWidth * scale;
+	float circleWidth = 0.005f;
+
+	appendArc(vertices, indices, colors, color, color, center, radius, width, resolution, -PI / 2 - deadSplit / 2, -(PI2 - deadSplit) * progress);
+	appendArc(vertices, indices, colors, white, white, center, glm::mix(width / 2, radius - width*ringPadding, progress), circleWidth, resolution, 0, PI2);
 }
 
 void KnobMonitor::appendArc(std::vector<glm::vec3>* vertices, std::vector<GLuint>* indices, std::vector<glm::vec4>* colors,

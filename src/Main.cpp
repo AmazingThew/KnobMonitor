@@ -63,6 +63,7 @@ int main() {
 	// MAIN LOOP
 	while (!glfwWindowShouldClose(window))
 	{
+		glClearColor(0.08, 0.15, 0.22, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		monitor->update();
