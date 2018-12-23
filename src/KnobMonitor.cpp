@@ -7,15 +7,17 @@
 #include "Knobs.h"
 
 
-KnobMonitor::KnobMonitor()
+KnobMonitor::KnobMonitor(KnobConfig::Config* config)
 {
+	this->config = config;
+
 	// basicShader = compileShader("D:\\Development\\C++\\KnobMonitor\\KnobMonitor\\shaders\\basic.vert", "D:\\Development\\C++\\KnobMonitor\\KnobMonitor\\shaders\\basic.frag");
 	basicShader = compileShader("./shaders/basic.vert", "./shaders/basic.frag");
 
 	dialMesh = new Mesh();
 	gaugeMesh = new Mesh();
-	appendGauge(gaugeMesh, glm::vec3(0, 0, 0), 1);
-	gaugeMesh->apply();
+
+	generateGauges(gaugeMesh);
 }
 
 
@@ -27,9 +29,8 @@ KnobMonitor::~KnobMonitor()
 
 void KnobMonitor::update()
 {
-	dialMesh->clear();
-	appendDial(dialMesh, glm::vec3(0, 0, 0), Knobs::get(7), Knobs::get(3));
-	dialMesh->apply();
+	generateDials(dialMesh);
+	generateGauges(gaugeMesh);
 }
 
 void KnobMonitor::draw()
@@ -94,6 +95,26 @@ GLuint KnobMonitor::compileShader(std::string vertexFilePath, std::string fragme
 	return program;
 }
 
+void KnobMonitor::generateGauges(Mesh* mesh)
+{
+	mesh->clear();
+	for (int i = 0; i < config->centers->size(); i++)
+	{
+		appendGauge(gaugeMesh, config->centers->at(i), config->gaugeScale);
+	}
+	mesh->apply();
+}
+
+void KnobMonitor::generateDials(Mesh* mesh)
+{
+	dialMesh->clear();
+	for (int i = 0; i < config->centers->size(); i++)
+	{
+		appendDial(dialMesh, config->centers->at(i), config->gaugeScale, Knobs::get(i));
+	}
+	dialMesh->apply();
+}
+
 void KnobMonitor::appendGauge(Mesh* mesh, glm::vec3 center, float scale)
 {
 	glm::vec4 color = white;
@@ -104,7 +125,7 @@ void KnobMonitor::appendGauge(Mesh* mesh, glm::vec3 center, float scale)
 
 	float tickRadius = radius + width * ringPadding;
 	float tickLength = width * ringPadding;
-	float tickWidth = 0.03f;
+	float tickWidth = 0.012f;
 	float thinTickWidth = 0.005f;
 
 	appendArc(mesh, color, color, center, tickRadius, arcWidth, resolution, -PI / 2.0f - deadSplit / 2.0f, -(PI2 - deadSplit));
@@ -116,10 +137,12 @@ void KnobMonitor::appendGauge(Mesh* mesh, glm::vec3 center, float scale)
 		float length = i % 2 == 0 ? tickLength : tickLength * 0.5f;
 		float tickLineWidth = i % 4 == 0 ? tickWidth : thinTickWidth;
 		glm::vec3 start = center + glm::vec3(glm::cos(angle), glm::sin(angle), 0) * tickRadius;
-		glm::vec3 end = center + glm::vec3(glm::cos(angle), glm::sin(angle), 0) * (tickRadius+length);
+		glm::vec3 end = center + glm::vec3(glm::cos(angle), glm::sin(angle), 0) * (tickRadius + length);
 
 		appendLine(mesh, color, color, start, end, tickLineWidth);
 	}
+
+	appendArc(mesh, red, red, center, scale, thinTickWidth, 64, 0, PI2);
 }
 
 void KnobMonitor::appendDial(Mesh* mesh, glm::vec3 center, float scale, float progress)
@@ -156,12 +179,12 @@ void KnobMonitor::appendArc(Mesh* mesh, glm::vec4 startColor, glm::vec4 endColor
 			glm::cos(angle) * (radius - width / 2) + center.x,
 			glm::sin(angle) * (radius - width / 2) + center.y,
 			center.z
-		));
+		) * config->aspectCorrection);
 		mesh->vertices.push_back(glm::vec3(
 			glm::cos(angle) * (radius + width / 2) + center.x,
 			glm::sin(angle) * (radius + width / 2) + center.y,
 			center.z
-		));
+		) * config->aspectCorrection);
 
 		float colorInterpolant = (float)i / (resolution - 1);
 		mesh->colors.push_back(glm::mix(startColor, endColor, colorInterpolant));
@@ -171,9 +194,15 @@ void KnobMonitor::appendArc(Mesh* mesh, glm::vec4 startColor, glm::vec4 endColor
 
 void KnobMonitor::appendLine(Mesh* mesh, glm::vec4 startColor, glm::vec4 endColor, glm::vec3 start, glm::vec3 end, float width)
 {
+	glm::vec3 lineWidth = glm::vec3(width / 2, width / 2, 0) * config->aspectCorrection;
+
+
 	glm::vec2 segment = end - start;
 	glm::vec2 direction = glm::normalize(segment);
-	glm::vec3 ortho = glm::vec3(-direction.y, direction.x, 0) * width / 2.0f;
+	glm::vec3 ortho = glm::vec3(-direction.y, direction.x, 0) * lineWidth;
+
+	start *= config->aspectCorrection;
+	end   *= config->aspectCorrection;
 
 	int startIndex = static_cast<int>(mesh->vertices.size());
 	mesh->indices.push_back(startIndex + 0);

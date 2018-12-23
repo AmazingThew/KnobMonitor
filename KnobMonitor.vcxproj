@@ -133,6 +133,7 @@
     <ClInclude Include="src\KnobMonitor.h" />
     <ClInclude Include="src\GLError.h" />
     <ClInclude Include="src\Knobs.h" />
+    <ClInclude Include="src\Config.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\basic.frag" />

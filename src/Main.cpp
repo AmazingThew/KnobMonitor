@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <vector>
 
+#include "Config.h"
 #include "KnobMonitor.h"
 #include "Knobs.h"
 
@@ -22,6 +23,9 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 int main() {
 	glfwSetErrorCallback(error_callback);
 
+	KnobConfig::Config* config = KnobConfig::getConfig();
+	glm::vec2 resolution = glm::vec2(1024 * config->aspectCorrection.y, 1024 * config->aspectCorrection.x);
+
 	// start GL context and O/S window using the GLFW helper library
 	if (!glfwInit()) {
 		fprintf(stderr, "ERROR: could not start GLFW3\n");
@@ -37,14 +41,14 @@ int main() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_SAMPLES, 8);
-	GLFWwindow* window = glfwCreateWindow(1024, 1024, "Knob Monitor", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(resolution.x, resolution.y, "Knob Monitor", NULL, NULL);
 	if (!window) {
 		fprintf(stderr, "ERROR: could not open window with GLFW3\n");
 		glfwTerminate();
 		return 1;
 	}
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	glfwSetWindowAspectRatio(window, 1, 1);
+	glfwSetWindowAspectRatio(window, resolution.x, resolution.y);
 	glfwMakeContextCurrent(window);
 
 	// Start GLAD
@@ -56,7 +60,7 @@ int main() {
 
 
 	// INITIALIZE
-	monitor = new KnobMonitor();
+	monitor = new KnobMonitor(config);
 	Knobs::start();
 	
 
