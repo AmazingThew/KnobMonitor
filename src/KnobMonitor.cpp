@@ -5,6 +5,7 @@
 
 #include "GLError.h"
 #include "Knobs.h"
+#include "Clipboard.h"
 
 
 KnobMonitor::KnobMonitor(KnobConfig::Config* config, GLFWwindow* window)
@@ -62,7 +63,7 @@ void KnobMonitor::update()
 		{
 			if (hoveredIndex == clickedIndex && hoveredIndex > -1)
 			{
-				printf("Clicked %i!\n", hoveredIndex);
+				copyToClipboard(window, Knobs::get(hoveredIndex));
 			}
 			clickedIndex = -1;
 		}

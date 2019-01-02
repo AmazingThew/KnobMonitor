@@ -19,28 +19,28 @@ namespace KnobConfig
 	inline Config* getConfig()
 	{
 		std::vector<glm::vec2> knobGrid;
-		// knobGrid.push_back(glm::vec2(3, 3));
-		// knobGrid.push_back(glm::vec2(3, 2));
-		// knobGrid.push_back(glm::vec2(3, 1));
-		// knobGrid.push_back(glm::vec2(3, 0));
-		// knobGrid.push_back(glm::vec2(2, 3));
-		// knobGrid.push_back(glm::vec2(2, 2));
-		// knobGrid.push_back(glm::vec2(2, 1));
-		// knobGrid.push_back(glm::vec2(2, 0));
-		// knobGrid.push_back(glm::vec2(1, 3));
-		// knobGrid.push_back(glm::vec2(1, 2));
-		// knobGrid.push_back(glm::vec2(1, 1));
-		// knobGrid.push_back(glm::vec2(1, 0));
-		// knobGrid.push_back(glm::vec2(0, 3));
-		// knobGrid.push_back(glm::vec2(0, 2));
-		// knobGrid.push_back(glm::vec2(0, 1));
-		// knobGrid.push_back(glm::vec2(0, 0));
-		//
-		//
-		knobGrid.push_back(glm::vec2(0, 0));
-		knobGrid.push_back(glm::vec2(0, 1));
-		knobGrid.push_back(glm::vec2(0, 2));
+		knobGrid.push_back(glm::vec2(3, 3));
+		knobGrid.push_back(glm::vec2(3, 2));
+		knobGrid.push_back(glm::vec2(3, 1));
+		knobGrid.push_back(glm::vec2(3, 0));
+		knobGrid.push_back(glm::vec2(2, 3));
+		knobGrid.push_back(glm::vec2(2, 2));
+		knobGrid.push_back(glm::vec2(2, 1));
+		knobGrid.push_back(glm::vec2(2, 0));
+		knobGrid.push_back(glm::vec2(1, 3));
 		knobGrid.push_back(glm::vec2(1, 2));
+		knobGrid.push_back(glm::vec2(1, 1));
+		knobGrid.push_back(glm::vec2(1, 0));
+		knobGrid.push_back(glm::vec2(0, 3));
+		knobGrid.push_back(glm::vec2(0, 2));
+		knobGrid.push_back(glm::vec2(0, 1));
+		knobGrid.push_back(glm::vec2(0, 0));
+		//
+		//
+		// knobGrid.push_back(glm::vec2(0, 0));
+		// knobGrid.push_back(glm::vec2(0, 1));
+		// knobGrid.push_back(glm::vec2(0, 2));
+		// knobGrid.push_back(glm::vec2(1, 2));
 
 		// knobGrid.push_back(glm::vec2(0, 0));
 		// knobGrid.push_back(glm::vec2(1, 0));
@@ -55,7 +55,7 @@ namespace KnobConfig
 			extents = glm::max(extents, knobGrid[i]);
 		}
 
-		float margin = 0.0f;
+		float margin = 0.03f;
 		glm::vec2 minCorner = glm::vec2(margin);
 		glm::vec2 maxCorner = glm::vec2(1 - margin);
 		glm::vec2 gaugeDiameter = (maxCorner - minCorner) / (extents + 1.0f);

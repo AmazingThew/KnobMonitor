@@ -7,7 +7,7 @@
 #include "KnobMonitor.h"
 #include "Knobs.h"
 
-#define BASE_RESOLUTION 1024
+#define BASE_RESOLUTION 512
 
 
 KnobMonitor* monitor;

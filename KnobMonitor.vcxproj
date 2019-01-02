@@ -129,6 +129,7 @@
     <ClCompile Include="src\glad.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Clipboard.h" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\KnobMonitor.h" />
     <ClInclude Include="src\GLError.h" />
