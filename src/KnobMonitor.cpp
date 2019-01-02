@@ -7,9 +7,10 @@
 #include "Knobs.h"
 
 
-KnobMonitor::KnobMonitor(KnobConfig::Config* config)
+KnobMonitor::KnobMonitor(KnobConfig::Config* config, GLFWwindow* window)
 {
 	this->config = config;
+	this->window = window;
 
 	// basicShader = compileShader("D:\\Development\\C++\\KnobMonitor\\KnobMonitor\\shaders\\basic.vert", "D:\\Development\\C++\\KnobMonitor\\KnobMonitor\\shaders\\basic.frag");
 	basicShader = compileShader("./shaders/basic.vert", "./shaders/basic.frag");
@@ -29,6 +30,44 @@ KnobMonitor::~KnobMonitor()
 
 void KnobMonitor::update()
 {
+	buttonState = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
+	isButtonPressed = buttonState == GLFW_PRESS;
+	wasButtonPressed = isButtonPressed && prevButtonState == GLFW_RELEASE;
+	wasButtonReleased = !isButtonPressed && prevButtonState == GLFW_PRESS;
+	prevButtonState = buttonState;
+
+	double mouseScreenX, mouseScreenY;
+	int screenWidth, screenHeight;
+	glfwGetCursorPos(window, &mouseScreenX, &mouseScreenY);
+	glfwGetWindowSize(window, &screenWidth, &screenHeight);
+	glm::vec3 mousePos = glm::vec3(glm::vec2(mouseScreenX / screenWidth, 1.0f - mouseScreenY / screenHeight) * 2.0f - 1.0f, 0);
+
+	hoveredIndex = -1;
+	if (glm::abs(mousePos.x) <= 1 && glm::abs(mousePos.y) <= 1)
+	{
+		for (int i = 0; i < config->centers->size(); ++i)
+		{
+			float distance = glm::length(config->centers->at(i) - mousePos / config->aspectCorrection);
+			if (distance < config->gaugeScale)
+			{
+				hoveredIndex = i;
+				break;
+			}
+		}
+
+		if (wasButtonPressed)
+			clickedIndex = hoveredIndex;
+
+		if (wasButtonReleased)
+		{
+			if (hoveredIndex == clickedIndex && hoveredIndex > -1)
+			{
+				printf("Clicked %i!\n", hoveredIndex);
+			}
+			clickedIndex = -1;
+		}
+	}
+
 	generateDials(dialMesh);
 	generateGauges(gaugeMesh);
 }
@@ -100,7 +139,7 @@ void KnobMonitor::generateGauges(Mesh* mesh)
 	mesh->clear();
 	for (int i = 0; i < config->centers->size(); i++)
 	{
-		appendGauge(gaugeMesh, config->centers->at(i), config->gaugeScale);
+		appendGauge(gaugeMesh, i, config->centers->at(i), config->gaugeScale);
 	}
 	mesh->apply();
 }
@@ -110,14 +149,17 @@ void KnobMonitor::generateDials(Mesh* mesh)
 	dialMesh->clear();
 	for (int i = 0; i < config->centers->size(); i++)
 	{
-		appendDial(dialMesh, config->centers->at(i), config->gaugeScale, Knobs::get(i));
+		appendDial(dialMesh, i, config->centers->at(i), config->gaugeScale, Knobs::get(i));
 	}
 	dialMesh->apply();
 }
 
-void KnobMonitor::appendGauge(Mesh* mesh, glm::vec3 center, float scale)
+void KnobMonitor::appendGauge(Mesh* mesh, int index, glm::vec3 center, float scale)
 {
-	glm::vec4 color = white;
+	bool hovered = index == hoveredIndex;
+	bool clicked = index == clickedIndex;
+	glm::vec4 color = hovered && (clicked || clickedIndex == -1) ? red : white;
+	scale *= clicked && hovered ? clickScale : 1;
 
 
 	float radius = baseKnobRadius * scale;
@@ -142,19 +184,24 @@ void KnobMonitor::appendGauge(Mesh* mesh, glm::vec3 center, float scale)
 		appendLine(mesh, color, color, start, end, tickLineWidth);
 	}
 
-	appendArc(mesh, red, red, center, scale, thinTickWidth, 64, 0, PI2);
+	// appendArc(mesh, red, red, center, scale, thinTickWidth, 64, 0, PI2);
 }
 
-void KnobMonitor::appendDial(Mesh* mesh, glm::vec3 center, float scale, float progress)
+void KnobMonitor::appendDial(Mesh* mesh, int index, glm::vec3 center, float scale, float progress)
 {
-	glm::vec4 color = red;
+	bool hovered = index == hoveredIndex;
+	bool clicked = index == clickedIndex;
+	scale *= clicked && hovered ? clickScale : 1;
+
+	glm::vec4 dialColor = red;
+	glm::vec4 hubColor = hovered && (clicked || clickedIndex == -1) ? red : white;;
 
 	float radius = baseKnobRadius * scale;
 	float width = baseDialWidth * scale;
 	float circleWidth = 0.005f;
 
-	appendArc(mesh, color, color, center, radius, width, resolution, -PI / 2 - deadSplit / 2, -(PI2 - deadSplit) * progress);
-	appendArc(mesh, white, white, center, glm::mix(width / 2, radius - width*ringPadding, progress), circleWidth, resolution, 0, PI2);
+	appendArc(mesh, dialColor, dialColor, center, radius, width, resolution, -PI / 2 - deadSplit / 2, -(PI2 - deadSplit) * progress);
+	appendArc(mesh, hubColor, hubColor, center, glm::mix(width / 2, radius - width*ringPadding, progress), circleWidth, resolution, 0, PI2);
 }
 
 void KnobMonitor::appendArc(Mesh* mesh, glm::vec4 startColor, glm::vec4 endColor, glm::vec3 center, float radius, float width, int resolution, float startAngle, float subtense)
@@ -221,4 +268,17 @@ void KnobMonitor::appendLine(Mesh* mesh, glm::vec4 startColor, glm::vec4 endColo
 	mesh->colors.push_back(startColor);
 	mesh->colors.push_back(endColor);
 	mesh->colors.push_back(endColor);
+}
+
+void KnobMonitor::appendBox(Mesh* mesh, glm::vec4 color, glm::vec3 center, glm::vec2 dimensions, float width)
+{
+	glm::vec2 halfDimensions = dimensions / 2.0f;
+	glm::vec3 dl = center + glm::vec3(-halfDimensions.x, -halfDimensions.y, 0);
+	glm::vec3 dr = center + glm::vec3(halfDimensions.x, -halfDimensions.y, 0);
+	glm::vec3 ul = center + glm::vec3(-halfDimensions.x, halfDimensions.y, 0);
+	glm::vec3 ur = center + glm::vec3(halfDimensions.x, halfDimensions.y, 0);
+	appendLine(mesh, color, color, dl, dr, width);
+	appendLine(mesh, color, color, dr, ur, width);
+	appendLine(mesh, color, color, ur, ul, width);
+	appendLine(mesh, color, color, ul, dl, width);
 }

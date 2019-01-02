@@ -24,7 +24,7 @@ int main() {
 	glfwSetErrorCallback(error_callback);
 
 	KnobConfig::Config* config = KnobConfig::getConfig();
-	glm::vec2 resolution = glm::vec2(1024 * config->aspectCorrection.y, 1024 * config->aspectCorrection.x);
+	glm::vec2 resolution = glm::vec2(1024 / config->aspectCorrection.x, 1024 / config->aspectCorrection.y);
 
 	// start GL context and O/S window using the GLFW helper library
 	if (!glfwInit()) {
@@ -60,7 +60,7 @@ int main() {
 
 
 	// INITIALIZE
-	monitor = new KnobMonitor(config);
+	monitor = new KnobMonitor(config, window);
 	Knobs::start();
 	
 

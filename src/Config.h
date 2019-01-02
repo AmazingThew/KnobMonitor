@@ -40,6 +40,7 @@ namespace KnobConfig
 		knobGrid.push_back(glm::vec2(0, 0));
 		knobGrid.push_back(glm::vec2(0, 1));
 		knobGrid.push_back(glm::vec2(0, 2));
+		knobGrid.push_back(glm::vec2(1, 2));
 
 		// knobGrid.push_back(glm::vec2(0, 0));
 		// knobGrid.push_back(glm::vec2(1, 0));
@@ -54,7 +55,7 @@ namespace KnobConfig
 			extents = glm::max(extents, knobGrid[i]);
 		}
 
-		float margin = 0;
+		float margin = 0.0f;
 		glm::vec2 minCorner = glm::vec2(margin);
 		glm::vec2 maxCorner = glm::vec2(1 - margin);
 		glm::vec2 gaugeDiameter = (maxCorner - minCorner) / (extents + 1.0f);
@@ -79,7 +80,7 @@ namespace KnobConfig
 		for (size_t i = 0; i < knobGrid.size(); i++)
 		{
 			glm::vec2 normalizedGridPosition = knobGrid[i] / glm::max(extents, glm::vec2(1));
-			centers->push_back(glm::vec3(glm::mix(minCenter, maxCenter, normalizedGridPosition) * 2.0f - 1.0f, 0));
+			centers->push_back(glm::vec3(glm::mix(minCenter, maxCenter, normalizedGridPosition) * 2.0f - 1.0f, 0) / aspectCorrection);
 		}
 
 		return new Config{
