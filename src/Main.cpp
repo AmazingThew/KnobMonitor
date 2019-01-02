@@ -7,6 +7,8 @@
 #include "KnobMonitor.h"
 #include "Knobs.h"
 
+#define BASE_RESOLUTION 1024
+
 
 KnobMonitor* monitor;
 
@@ -24,7 +26,7 @@ int main() {
 	glfwSetErrorCallback(error_callback);
 
 	KnobConfig::Config* config = KnobConfig::getConfig();
-	glm::vec2 resolution = glm::vec2(1024 / config->aspectCorrection.x, 1024 / config->aspectCorrection.y);
+	glm::vec2 resolution = glm::vec2(BASE_RESOLUTION / config->aspectCorrection.x, BASE_RESOLUTION / config->aspectCorrection.y);
 
 	// start GL context and O/S window using the GLFW helper library
 	if (!glfwInit()) {
