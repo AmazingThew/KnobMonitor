@@ -59,6 +59,9 @@
     <ClInclude Include="src\stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\json.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\basic.frag" />
@@ -66,6 +69,7 @@
     <None Include="assets\basic.frag" />
     <None Include="assets\basic.vert" />
     <None Include="assets\textured.frag" />
+    <None Include="config.json" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\Numbers.png">

@@ -131,6 +131,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Clipboard.h" />
+    <ClInclude Include="src\json.hpp" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\KnobMonitor.h" />
     <ClInclude Include="src\GLError.h" />
@@ -142,6 +143,7 @@
     <None Include="assets\basic.frag" />
     <None Include="assets\basic.vert" />
     <None Include="assets\textured.frag" />
+    <None Include="config.json" />
     <None Include="shaders\basic.frag" />
     <None Include="shaders\basic.vert" />
   </ItemGroup>

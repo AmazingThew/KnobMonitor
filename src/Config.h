@@ -1,11 +1,17 @@
 #pragma once
 #include <glm/glm.hpp>
 #include <vector>
-#include "Knobs.h"
 #include <memory>
+#include <fstream>
+#include "Knobs.h"
+#include "json.hpp"
+#include <iostream>
+
+using nlohmann::json;
 
 namespace KnobConfig
 {
+
 	struct Config
 	{
 		std::shared_ptr<std::vector<glm::vec3>> centers;
@@ -18,39 +24,33 @@ namespace KnobConfig
 
 	inline Config* getConfig()
 	{
-		std::vector<glm::vec2> knobGrid;
-		knobGrid.push_back(glm::vec2(3, 3));
-		knobGrid.push_back(glm::vec2(3, 2));
-		knobGrid.push_back(glm::vec2(3, 1));
-		knobGrid.push_back(glm::vec2(3, 0));
-		knobGrid.push_back(glm::vec2(2, 3));
-		knobGrid.push_back(glm::vec2(2, 2));
-		knobGrid.push_back(glm::vec2(2, 1));
-		knobGrid.push_back(glm::vec2(2, 0));
-		knobGrid.push_back(glm::vec2(1, 3));
-		knobGrid.push_back(glm::vec2(1, 2));
-		knobGrid.push_back(glm::vec2(1, 1));
-		knobGrid.push_back(glm::vec2(1, 0));
-		knobGrid.push_back(glm::vec2(0, 3));
-		knobGrid.push_back(glm::vec2(0, 2));
-		knobGrid.push_back(glm::vec2(0, 1));
-		knobGrid.push_back(glm::vec2(0, 0));
-		//
-		//
-		// knobGrid.push_back(glm::vec2(0, 0));
-		// knobGrid.push_back(glm::vec2(0, 1));
-		// knobGrid.push_back(glm::vec2(0, 2));
-		// knobGrid.push_back(glm::vec2(1, 2));
+		const int maxKnobs = 64;
 
-		// knobGrid.push_back(glm::vec2(0, 0));
-		// knobGrid.push_back(glm::vec2(1, 0));
-		// knobGrid.push_back(glm::vec2(2, 0));
+		glm::vec2 knobGrid[maxKnobs];
+
+		json j;
+		std::ifstream i("config.json");
+		i >> j;
+
+		int y = 0;
+		int numKnobs = 0;
+		for (auto knobRow : j["Knobs"])
+		{
+			int x = 0;
+			for (auto knobIndex : knobRow)
+			{
+				knobGrid[knobIndex.get<int>()] = glm::vec2(x, y);
+				x++;
+				numKnobs++;
+			}
+			y++;
+		}
 
 		std::shared_ptr<std::vector<glm::vec3>> centers(new std::vector<glm::vec3>());
 
 
 		glm::vec2 extents = glm::vec2(0);
-		for (size_t i = 0; i < knobGrid.size(); i++)
+		for (int i=0; i<numKnobs; i++)
 		{
 			extents = glm::max(extents, knobGrid[i]);
 		}
@@ -77,9 +77,10 @@ namespace KnobConfig
 			aspectCorrection = glm::vec3(1 / aspect, 1, 1);
 		}
 
-		for (size_t i = 0; i < knobGrid.size(); i++)
+		for (int i = 0; i<numKnobs; i++)
 		{
 			glm::vec2 normalizedGridPosition = knobGrid[i] / glm::max(extents, glm::vec2(1));
+			normalizedGridPosition = glm::vec2(normalizedGridPosition.x, 1 - normalizedGridPosition.y); // Hilarious Y flip
 			centers->push_back(glm::vec3(glm::mix(minCenter, maxCenter, normalizedGridPosition) * 2.0f - 1.0f, 0) / aspectCorrection);
 		}
 
