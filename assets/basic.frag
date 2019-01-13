@@ -1,6 +1,7 @@
 #version 400
 
 in vec3 VertexColor;
+in vec2 UV;
 out vec4 frag_color;
 
 void main() {

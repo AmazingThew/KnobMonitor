@@ -6,6 +6,7 @@
 #include "GLError.h"
 #include "Knobs.h"
 #include "Clipboard.h"
+#include "stb_image.h"
 
 
 KnobMonitor::KnobMonitor(KnobConfig::Config* config, GLFWwindow* window)
@@ -14,10 +15,14 @@ KnobMonitor::KnobMonitor(KnobConfig::Config* config, GLFWwindow* window)
 	this->window = window;
 
 	// basicShader = compileShader("D:\\Development\\C++\\KnobMonitor\\KnobMonitor\\shaders\\basic.vert", "D:\\Development\\C++\\KnobMonitor\\KnobMonitor\\shaders\\basic.frag");
-	basicShader = compileShader("./shaders/basic.vert", "./shaders/basic.frag");
+	basicShader = compileShader("./assets/basic.vert", "./assets/basic.frag");
+	textureShader = compileShader("./assets/basic.vert", "./assets/textured.frag");
+	
+	loadNumberTexture();
 
-	dialMesh = new Mesh();
-	gaugeMesh = new Mesh();
+	dialMesh   = new Mesh();
+	gaugeMesh  = new Mesh();
+	numberMesh = new Mesh();
 
 	generateGauges(gaugeMesh);
 }
@@ -25,6 +30,7 @@ KnobMonitor::KnobMonitor(KnobConfig::Config* config, GLFWwindow* window)
 
 KnobMonitor::~KnobMonitor()
 {
+	delete numberMesh;
 	delete gaugeMesh;
 	delete dialMesh;
 }
@@ -36,13 +42,13 @@ void KnobMonitor::update()
 	wasButtonPressed = isButtonPressed && prevButtonState == GLFW_RELEASE;
 	wasButtonReleased = !isButtonPressed && prevButtonState == GLFW_PRESS;
 	prevButtonState = buttonState;
-
+	
 	double mouseScreenX, mouseScreenY;
 	int screenWidth, screenHeight;
 	glfwGetCursorPos(window, &mouseScreenX, &mouseScreenY);
 	glfwGetWindowSize(window, &screenWidth, &screenHeight);
 	glm::vec3 mousePos = glm::vec3(glm::vec2(mouseScreenX / screenWidth, 1.0f - mouseScreenY / screenHeight) * 2.0f - 1.0f, 0);
-
+	
 	hoveredIndex = -1;
 	if (glm::abs(mousePos.x) <= 1 && glm::abs(mousePos.y) <= 1)
 	{
@@ -55,10 +61,10 @@ void KnobMonitor::update()
 				break;
 			}
 		}
-
+	
 		if (wasButtonPressed)
 			clickedIndex = hoveredIndex;
-
+	
 		if (wasButtonReleased)
 		{
 			if (hoveredIndex == clickedIndex && hoveredIndex > -1)
@@ -68,15 +74,17 @@ void KnobMonitor::update()
 			clickedIndex = -1;
 		}
 	}
-
+	
 	generateDials(dialMesh);
 	generateGauges(gaugeMesh);
+	generateNumbers(numberMesh);
 }
 
 void KnobMonitor::draw()
 {
 	gaugeMesh->draw(basicShader);
 	dialMesh->draw(basicShader);
+	numberMesh->draw(textureShader, numberTexture);
 }
 
 GLuint KnobMonitor::compileShader(std::string filePath, GLenum shaderType)
@@ -135,6 +143,52 @@ GLuint KnobMonitor::compileShader(std::string vertexFilePath, std::string fragme
 	return program;
 }
 
+void KnobMonitor::loadNumberTexture()
+{
+	glGenTextures(1, &numberTexture);
+	glBindTexture(GL_TEXTURE_2D, numberTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	int width, height, numChannels;
+	unsigned char *data = stbi_load("./assets/Numbers.png", &width, &height, &numChannels, 4);
+	
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		fprintf(stderr, "Failed to load numberTexture\n");
+	}
+
+	stbi_image_free(data);
+
+	check_gl_error();
+}
+
+void KnobMonitor::generateNumbers(Mesh* mesh)
+{
+	mesh->clear();
+
+	for (int index = 0; index < config->centers->size(); ++index)
+	{
+		float centerOffset = (baseKnobRadius * ringPadding) * config->gaugeScale;
+		bool hovered = index == hoveredIndex;
+		bool clicked = index == clickedIndex;
+		glm::vec4 color = hovered && (clicked || clickedIndex == -1) ? red : white;
+		float clickScaleFactor = clicked && hovered ? clickScale : 1;
+
+		glm::vec3 center = config->centers->at(index) - glm::vec3(0, centerOffset * clickScaleFactor, 0);
+		appendNumberQuad(mesh, index, color, center, numberSize * clickScaleFactor);
+	}
+
+	mesh->apply();
+}
+
 void KnobMonitor::generateGauges(Mesh* mesh)
 {
 	mesh->clear();
@@ -168,8 +222,8 @@ void KnobMonitor::appendGauge(Mesh* mesh, int index, glm::vec3 center, float sca
 
 	float tickRadius = radius + width * ringPadding;
 	float tickLength = width * ringPadding;
-	float tickWidth = 0.012f;
-	float thinTickWidth = 0.005f;
+	float tickWidth = arcWidth;// 0.009f;
+	float thinTickWidth = tickWidth * 0.7f;
 
 	appendArc(mesh, color, color, center, tickRadius, arcWidth, resolution, -PI / 2.0f - deadSplit / 2.0f, -(PI2 - deadSplit));
 
@@ -237,6 +291,9 @@ void KnobMonitor::appendArc(Mesh* mesh, glm::vec4 startColor, glm::vec4 endColor
 		float colorInterpolant = (float)i / (resolution - 1);
 		mesh->colors.push_back(glm::mix(startColor, endColor, colorInterpolant));
 		mesh->colors.push_back(glm::mix(startColor, endColor, colorInterpolant));
+
+		mesh->uvs.push_back(glm::vec2(0, colorInterpolant));
+		mesh->uvs.push_back(glm::vec2(1, colorInterpolant));
 	}
 }
 
@@ -269,6 +326,11 @@ void KnobMonitor::appendLine(Mesh* mesh, glm::vec4 startColor, glm::vec4 endColo
 	mesh->colors.push_back(startColor);
 	mesh->colors.push_back(endColor);
 	mesh->colors.push_back(endColor);
+
+	mesh->uvs.push_back(glm::vec2(0, 0));
+	mesh->uvs.push_back(glm::vec2(1, 0));
+	mesh->uvs.push_back(glm::vec2(1, 1));
+	mesh->uvs.push_back(glm::vec2(0, 1));
 }
 
 void KnobMonitor::appendBox(Mesh* mesh, glm::vec4 color, glm::vec3 center, glm::vec2 dimensions, float width)
@@ -282,4 +344,36 @@ void KnobMonitor::appendBox(Mesh* mesh, glm::vec4 color, glm::vec3 center, glm::
 	appendLine(mesh, color, color, dr, ur, width);
 	appendLine(mesh, color, color, ur, ul, width);
 	appendLine(mesh, color, color, ul, dl, width);
+}
+
+void KnobMonitor::appendNumberQuad(Mesh* mesh, int index, glm::vec4 color, glm::vec3 center, float scale)
+{
+	float gridSize = 1.0f / 8.0f;
+	float left = gridSize * (index % 8);
+	float right = left + gridSize;
+	float up = gridSize * (index / 8);
+	float down = up + gridSize;
+
+	int startIndex = static_cast<int>(mesh->vertices.size());
+	mesh->indices.push_back(startIndex + 0);
+	mesh->indices.push_back(startIndex + 2);
+	mesh->indices.push_back(startIndex + 3);
+	mesh->indices.push_back(startIndex + 0);
+	mesh->indices.push_back(startIndex + 1);
+	mesh->indices.push_back(startIndex + 2);
+
+	mesh->vertices.push_back(center + glm::vec3(-scale, -scale, 0));
+	mesh->vertices.push_back(center + glm::vec3(-scale, scale, 0));
+	mesh->vertices.push_back(center + glm::vec3(scale, scale, 0));
+	mesh->vertices.push_back(center + glm::vec3(scale, -scale, 0));
+
+	mesh->colors.push_back(color);
+	mesh->colors.push_back(color);
+	mesh->colors.push_back(color);
+	mesh->colors.push_back(color);
+
+	mesh->uvs.push_back(glm::vec2(left, down));
+	mesh->uvs.push_back(glm::vec2(left, up));
+	mesh->uvs.push_back(glm::vec2(right, up));
+	mesh->uvs.push_back(glm::vec2(right, down));
 }

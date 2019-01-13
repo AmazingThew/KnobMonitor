@@ -69,8 +69,12 @@ int main() {
 	// MAIN LOOP
 	while (!glfwWindowShouldClose(window))
 	{
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 		glClearColor(0.08f, 0.15f, 0.22f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+
 
 		monitor->update();
 		monitor->draw();

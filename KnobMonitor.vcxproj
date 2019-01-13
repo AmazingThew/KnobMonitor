@@ -127,6 +127,7 @@
     <ClCompile Include="src\Knobs.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\glad.c" />
+    <ClCompile Include="src\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Clipboard.h" />
@@ -135,10 +136,17 @@
     <ClInclude Include="src\GLError.h" />
     <ClInclude Include="src\Knobs.h" />
     <ClInclude Include="src\Config.h" />
+    <ClInclude Include="src\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\basic.frag" />
+    <None Include="assets\basic.vert" />
+    <None Include="assets\textured.frag" />
     <None Include="shaders\basic.frag" />
     <None Include="shaders\basic.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\Numbers.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

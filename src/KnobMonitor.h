@@ -33,6 +33,7 @@ private:
 	float deadSplit = 1;
 	float arcWidth = 0.005f;
 	float clickScale = 0.91f;
+	float numberSize = 0.04724409f;
 	int numTicks = 17;
 	int resolution = 64;
 
@@ -42,14 +43,21 @@ private:
 	int hoveredIndex = -1;
 	int clickedIndex = -1;
 
+	Mesh* numberMesh;
 	Mesh* gaugeMesh;
 	Mesh* dialMesh;
 
 	GLuint basicShader;
+	GLuint textureShader;
+
+	GLuint numberTexture;
 
 	GLuint compileShader(std::string filePath, GLenum shaderType);
 	GLuint compileShader(std::string vertexFilePath, std::string fragmentFilePath);
 
+	void loadNumberTexture();
+
+	void generateNumbers(Mesh* mesh);
 	void generateGauges(Mesh* mesh);
 	void generateDials(Mesh* mesh);
 
@@ -59,6 +67,7 @@ private:
 	void appendArc(Mesh* mesh, glm::vec4 startColor, glm::vec4 endColor, glm::vec3 center, float radius, float width, int resolution, float startAngle, float subtense);
 	void appendLine(Mesh* mesh, glm::vec4 startColor, glm::vec4 endColor, glm::vec3 start, glm::vec3 end, float width);
 	void appendBox(Mesh* mesh, glm::vec4 color, glm::vec3 center, glm::vec2 dimensions, float width);
+	void appendNumberQuad(Mesh* mesh, int index, glm::vec4 color, glm::vec3 center, float scale);
 
 	float remap(float inMin, float inMax, float outMin, float outMax, float value)
 	{
