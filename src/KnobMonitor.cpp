@@ -183,6 +183,7 @@ void KnobMonitor::generateNumbers(Mesh* mesh)
 		float clickScaleFactor = clicked && hovered ? clickScale : 1;
 
 		glm::vec3 center = config->centers->at(index) - glm::vec3(0, centerOffset * clickScaleFactor, 0);
+		center *= config->aspectCorrection;
 		appendNumberQuad(mesh, index, color, center, numberSize * clickScaleFactor);
 	}
 
@@ -222,7 +223,7 @@ void KnobMonitor::appendGauge(Mesh* mesh, int index, glm::vec3 center, float sca
 
 	float tickRadius = radius + width * ringPadding;
 	float tickLength = width * ringPadding;
-	float tickWidth = arcWidth;// 0.009f;
+	float tickWidth = arcWidth;
 	float thinTickWidth = tickWidth * 0.7f;
 
 	appendArc(mesh, color, color, center, tickRadius, arcWidth, resolution, -PI / 2.0f - deadSplit / 2.0f, -(PI2 - deadSplit));
@@ -362,10 +363,10 @@ void KnobMonitor::appendNumberQuad(Mesh* mesh, int index, glm::vec4 color, glm::
 	mesh->indices.push_back(startIndex + 1);
 	mesh->indices.push_back(startIndex + 2);
 
-	mesh->vertices.push_back(center + glm::vec3(-scale, -scale, 0));
-	mesh->vertices.push_back(center + glm::vec3(-scale, scale, 0));
-	mesh->vertices.push_back(center + glm::vec3(scale, scale, 0));
-	mesh->vertices.push_back(center + glm::vec3(scale, -scale, 0));
+	mesh->vertices.push_back(center + glm::vec3(-scale, -scale, 0) * config->aspectCorrection);
+	mesh->vertices.push_back(center + glm::vec3(-scale,  scale, 0) * config->aspectCorrection);
+	mesh->vertices.push_back(center + glm::vec3( scale,  scale, 0) * config->aspectCorrection);
+	mesh->vertices.push_back(center + glm::vec3( scale, -scale, 0) * config->aspectCorrection);
 
 	mesh->colors.push_back(color);
 	mesh->colors.push_back(color);
