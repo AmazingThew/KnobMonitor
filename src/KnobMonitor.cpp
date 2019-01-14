@@ -9,10 +9,11 @@
 #include "stb_image.h"
 
 
-KnobMonitor::KnobMonitor(KnobConfig* config, GLFWwindow* window)
+KnobMonitor::KnobMonitor(KnobConfig* config, GLFWwindow* window, Input* input)
 {
 	this->config = config;
 	this->window = window;
+	this->input = input;
 
 	currentPage = config->currentPage();
 
@@ -40,12 +41,6 @@ KnobMonitor::~KnobMonitor()
 void KnobMonitor::update()
 {
 	currentPage = config->currentPage();
-
-	buttonState = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
-	isButtonPressed = buttonState == GLFW_PRESS;
-	wasButtonPressed = isButtonPressed && prevButtonState == GLFW_RELEASE;
-	wasButtonReleased = !isButtonPressed && prevButtonState == GLFW_PRESS;
-	prevButtonState = buttonState;
 	
 	double mouseScreenX, mouseScreenY;
 	int screenWidth, screenHeight;
@@ -66,10 +61,10 @@ void KnobMonitor::update()
 			}
 		}
 	
-		if (wasButtonPressed)
+		if (input->wasMousePressed)
 			clickedIndex = hoveredIndex;
 	
-		if (wasButtonReleased)
+		if (input->wasMouseReleased)
 		{
 			if (hoveredIndex == clickedIndex && hoveredIndex > -1)
 			{

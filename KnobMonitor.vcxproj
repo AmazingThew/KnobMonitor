@@ -121,6 +121,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Input.cpp" />
     <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\KnobMonitor.cpp" />
@@ -131,6 +132,7 @@
     <ClCompile Include="src\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\Clipboard.h" />
     <ClInclude Include="src\json.hpp" />
     <ClInclude Include="src\Mesh.h" />

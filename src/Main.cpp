@@ -11,6 +11,7 @@
 
 
 KnobMonitor* monitor;
+Input* input;
 
 void error_callback(int error, const char* description)
 {
@@ -74,7 +75,8 @@ int main() {
 
 
 	// INITIALIZE
-	monitor = new KnobMonitor(config, window);
+	input = new Input(window);
+	monitor = new KnobMonitor(config, window, input);
 	Knobs::start();
 	
 
@@ -87,19 +89,18 @@ int main() {
 		glClearColor(0.08f, 0.15f, 0.22f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-
+		input->update();
 		monitor->update();
 		monitor->draw();
 
 		glfwSwapBuffers(window);
-		glfwWaitEvents();
 
-		if (glfwGetKey(window, GLFW_KEY_RIGHT)) {
+		if (input->wasRightPressed) {
 			config->incrementPage();
 			change_aspect(config, window);
 		}
 
-		if (glfwGetKey(window, GLFW_KEY_LEFT)) {
+		if (input->wasLeftPressed) {
 			config->decrementPage();
 			change_aspect(config, window);
 		}
@@ -107,6 +108,8 @@ int main() {
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE)) {
 			glfwSetWindowShouldClose(window, 1);
 		}
+
+		glfwWaitEvents();
 	}
 
 

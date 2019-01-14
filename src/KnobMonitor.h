@@ -6,6 +6,7 @@
 #include "Mesh.h"
 #include "Config.h"
 #include <GLFW/glfw3.h>
+#include "Input.h"
 
 #define PI 3.14159265359f
 #define PI2 6.28318530718f
@@ -13,7 +14,7 @@
 class KnobMonitor
 {
 public:
-	KnobMonitor(KnobConfig* config, GLFWwindow* window);
+	KnobMonitor(KnobConfig* config, GLFWwindow* window, Input* input);
 	~KnobMonitor();
 
 	void update();
@@ -23,6 +24,7 @@ private:
 	KnobConfig* config;
 	KnobConfig::Page* currentPage;
 	GLFWwindow* window;
+	Input* input;
 
 	glm::vec4 red   = glm::vec4(0.9, 0.1, 0.15, 1);
 	glm::vec4 white = glm::vec4(1, 0.96, 0.91, 1);
@@ -37,9 +39,6 @@ private:
 	float numberSize = 0.04724409f;
 	int numTicks = 17;
 	int resolution = 64;
-
-	int buttonState, prevButtonState;
-	bool isButtonPressed, wasButtonPressed, wasButtonReleased;
 
 	int hoveredIndex = -1;
 	int clickedIndex = -1;
