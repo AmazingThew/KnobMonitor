@@ -1,11 +1,8 @@
 #pragma once
+#include "Utils/json.hpp"
 #include <glm/glm.hpp>
 #include <vector>
 #include <memory>
-#include <fstream>
-#include "Knobs.h"
-#include "json.hpp"
-#include <iostream>
 
 using nlohmann::json;
 

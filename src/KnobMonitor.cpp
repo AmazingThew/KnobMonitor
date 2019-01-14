@@ -1,12 +1,13 @@
 #include "KnobMonitor.h"
 #include <cstdio>
 #include <fstream>
+#include <vector>
 #include <GLFW/glfw3.h>
 
-#include "GLError.h"
+#include "Utils/GLError.h"
 #include "Knobs.h"
 #include "Clipboard.h"
-#include "stb_image.h"
+#include "Utils/stb_image.h"
 
 
 KnobMonitor::KnobMonitor(KnobConfig* config, GLFWwindow* window, Input* input)

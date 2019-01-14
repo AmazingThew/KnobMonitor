@@ -1,12 +1,11 @@
 #pragma once
+#include "Mesh.h"
+#include "Config.h"
+#include "Input.h"
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <string>
-#include <vector>
-#include "Mesh.h"
-#include "Config.h"
 #include <GLFW/glfw3.h>
-#include "Input.h"
 
 #define PI 3.14159265359f
 #define PI2 6.28318530718f

@@ -1,7 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h> // GLFW helper library
 #include <stdio.h>
-#include <vector>
 
 #include "Config.h"
 #include "KnobMonitor.h"
@@ -29,9 +28,10 @@ void change_aspect(KnobConfig* config, GLFWwindow* window)
 	glfwGetWindowSize(window, &prevWidth, &prevHeight);
 	baseResolution = glm::max(prevWidth, prevHeight);
 
-	glm::vec2 resolution = glm::vec2(baseResolution / config->currentPage()->aspectCorrection.x, baseResolution / config->currentPage()->aspectCorrection.y);
-	glfwSetWindowSize(window, resolution.x, resolution.y);
-	glfwSetWindowAspectRatio(window, resolution.x, resolution.y);
+	int width  = static_cast<int>(baseResolution / config->currentPage()->aspectCorrection.x);
+	int height = static_cast<int>(baseResolution / config->currentPage()->aspectCorrection.y);
+	glfwSetWindowSize(window, width, height);
+	glfwSetWindowAspectRatio(window, width, height);
 
 }
 
@@ -39,7 +39,6 @@ int main() {
 	glfwSetErrorCallback(error_callback);
 
 	KnobConfig* config = new KnobConfig();
-	glm::vec2 resolution = glm::vec2(BASE_RESOLUTION / config->currentPage()->aspectCorrection.x, BASE_RESOLUTION / config->currentPage()->aspectCorrection.y);
 
 	// start GL context and O/S window using the GLFW helper library
 	if (!glfwInit()) {
@@ -56,14 +55,16 @@ int main() {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
 	glfwWindowHint(GLFW_SAMPLES, 8);
-	GLFWwindow* window = glfwCreateWindow(resolution.x, resolution.y, "Knob Monitor", NULL, NULL);
+	int width  = static_cast<int>(BASE_RESOLUTION / config->currentPage()->aspectCorrection.x);
+	int height = static_cast<int>(BASE_RESOLUTION / config->currentPage()->aspectCorrection.y);
+	GLFWwindow* window = glfwCreateWindow(width, height, "Knob Monitor", NULL, NULL);
 	if (!window) {
 		fprintf(stderr, "ERROR: could not open window with GLFW3\n");
 		glfwTerminate();
 		return 1;
 	}
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-	glfwSetWindowAspectRatio(window, resolution.x, resolution.y);
+	glfwSetWindowAspectRatio(window, width, height);
 	glfwMakeContextCurrent(window);
 
 	// Start GLAD

@@ -1,5 +1,5 @@
 #include "Mesh.h"
-#include "GLError.h"
+#include "Utils/GLError.h"
 
 
 Mesh::Mesh()

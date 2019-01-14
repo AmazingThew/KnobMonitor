@@ -125,22 +125,22 @@
     <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\KnobMonitor.cpp" />
-    <ClCompile Include="src\GLError.cpp" />
+    <ClCompile Include="include\Utils\GLError.cpp" />
     <ClCompile Include="src\Knobs.cpp" />
     <ClCompile Include="src\Main.cpp" />
     <ClCompile Include="src\glad.c" />
-    <ClCompile Include="src\stb_image.cpp" />
+    <ClCompile Include="include\Utils\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\Clipboard.h" />
-    <ClInclude Include="src\json.hpp" />
+    <ClInclude Include="include\Utils\json.hpp" />
     <ClInclude Include="src\Mesh.h" />
     <ClInclude Include="src\KnobMonitor.h" />
-    <ClInclude Include="src\GLError.h" />
+    <ClInclude Include="include\Utils\GLError.h" />
     <ClInclude Include="src\Knobs.h" />
     <ClInclude Include="src\Config.h" />
-    <ClInclude Include="src\stb_image.h" />
+    <ClInclude Include="include\Utils\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\basic.frag" />

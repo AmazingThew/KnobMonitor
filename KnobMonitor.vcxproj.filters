@@ -21,9 +21,6 @@
     <ClCompile Include="src\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\GLError.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\KnobMonitor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -33,20 +30,20 @@
     <ClCompile Include="src\Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\stb_image.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Config.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="include\Utils\GLError.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="include\Utils\stb_image.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\GLError.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\KnobMonitor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -59,16 +56,19 @@
     <ClInclude Include="src\Config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Input.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="src\Clipboard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\stb_image.h">
+    <ClInclude Include="include\Utils\GLError.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\json.hpp">
+    <ClInclude Include="include\Utils\json.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Input.h">
+    <ClInclude Include="include\Utils\stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
