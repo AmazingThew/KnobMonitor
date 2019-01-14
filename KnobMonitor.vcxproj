@@ -128,7 +128,7 @@
     <ClCompile Include="include\Utils\GLError.cpp" />
     <ClCompile Include="src\Knobs.cpp" />
     <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\glad.c" />
+    <ClCompile Include="include\Utils\glad.c" />
     <ClCompile Include="include\Utils\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>

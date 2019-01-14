@@ -63,7 +63,7 @@ void Mesh::draw(GLuint shader)
 {
 	glUseProgram(shader);
 	glBindVertexArray(vao);
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, (int) indices.size(), GL_UNSIGNED_INT, 0);
 
 	check_gl_error();
 }
@@ -73,7 +73,7 @@ void Mesh::draw(GLuint shader, GLuint texture)
 	glUseProgram(shader);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glBindVertexArray(vao);
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, (int) indices.size(), GL_UNSIGNED_INT, 0);
 
 	check_gl_error();
 }

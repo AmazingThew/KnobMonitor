@@ -98,13 +98,13 @@ KnobConfig::Page* KnobConfig::currentPage()
 
 void KnobConfig::incrementPage()
 {
-	int modulus = pages.size();
+	int modulus = (int) pages.size();
 	currentPageIndex = (currentPageIndex + 1) % modulus;
 }
 
 void KnobConfig::decrementPage()
 {
-	int a = currentPageIndex - 1;
-	int n = pages.size();
-	currentPageIndex = a - n * glm::floor(static_cast<float>(a) / n); //Knuth modulus, correctly handles negative divident
+	float a = (float) (currentPageIndex - 1);
+	float n = (float) pages.size();
+	currentPageIndex = (int) (a - n * glm::floor(a / n)); //Knuth modulus, correctly handles negative divident
 }
