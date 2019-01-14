@@ -22,11 +22,23 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
+void change_aspect(KnobConfig* config, GLFWwindow* window)
+{
+	int prevWidth, prevHeight, baseResolution;
+	glfwGetWindowSize(window, &prevWidth, &prevHeight);
+	baseResolution = glm::max(prevWidth, prevHeight);
+
+	glm::vec2 resolution = glm::vec2(baseResolution / config->currentPage()->aspectCorrection.x, baseResolution / config->currentPage()->aspectCorrection.y);
+	glfwSetWindowSize(window, resolution.x, resolution.y);
+	glfwSetWindowAspectRatio(window, resolution.x, resolution.y);
+
+}
+
 int main() {
 	glfwSetErrorCallback(error_callback);
 
-	KnobConfig::Config* config = KnobConfig::getConfig();
-	glm::vec2 resolution = glm::vec2(BASE_RESOLUTION / config->aspectCorrection.x, BASE_RESOLUTION / config->aspectCorrection.y);
+	KnobConfig* config = new KnobConfig();
+	glm::vec2 resolution = glm::vec2(BASE_RESOLUTION / config->currentPage()->aspectCorrection.x, BASE_RESOLUTION / config->currentPage()->aspectCorrection.y);
 
 	// start GL context and O/S window using the GLFW helper library
 	if (!glfwInit()) {
@@ -81,6 +93,16 @@ int main() {
 
 		glfwSwapBuffers(window);
 		glfwWaitEvents();
+
+		if (glfwGetKey(window, GLFW_KEY_RIGHT)) {
+			config->incrementPage();
+			change_aspect(config, window);
+		}
+
+		if (glfwGetKey(window, GLFW_KEY_LEFT)) {
+			config->decrementPage();
+			change_aspect(config, window);
+		}
 
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE)) {
 			glfwSetWindowShouldClose(window, 1);

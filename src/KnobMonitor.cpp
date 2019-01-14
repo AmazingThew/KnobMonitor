@@ -9,10 +9,12 @@
 #include "stb_image.h"
 
 
-KnobMonitor::KnobMonitor(KnobConfig::Config* config, GLFWwindow* window)
+KnobMonitor::KnobMonitor(KnobConfig* config, GLFWwindow* window)
 {
 	this->config = config;
 	this->window = window;
+
+	currentPage = config->currentPage();
 
 	// basicShader = compileShader("D:\\Development\\C++\\KnobMonitor\\KnobMonitor\\shaders\\basic.vert", "D:\\Development\\C++\\KnobMonitor\\KnobMonitor\\shaders\\basic.frag");
 	basicShader = compileShader("./assets/basic.vert", "./assets/basic.frag");
@@ -37,6 +39,8 @@ KnobMonitor::~KnobMonitor()
 
 void KnobMonitor::update()
 {
+	currentPage = config->currentPage();
+
 	buttonState = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
 	isButtonPressed = buttonState == GLFW_PRESS;
 	wasButtonPressed = isButtonPressed && prevButtonState == GLFW_RELEASE;
@@ -52,12 +56,12 @@ void KnobMonitor::update()
 	hoveredIndex = -1;
 	if (glm::abs(mousePos.x) <= 1 && glm::abs(mousePos.y) <= 1)
 	{
-		for (int i = 0; i < config->centers->size(); ++i)
+		for (auto knob : *currentPage->knobs)
 		{
-			float distance = glm::length(config->centers->at(i) - mousePos / config->aspectCorrection);
-			if (distance < config->gaugeScale)
+			float distance = glm::length(knob.center - mousePos / currentPage->aspectCorrection);
+			if (distance < currentPage->gaugeScale)
 			{
-				hoveredIndex = i;
+				hoveredIndex = knob.index;
 				break;
 			}
 		}
@@ -174,17 +178,17 @@ void KnobMonitor::generateNumbers(Mesh* mesh)
 {
 	mesh->clear();
 
-	for (int index = 0; index < config->centers->size(); ++index)
+	for (auto knob : *currentPage->knobs)
 	{
-		float centerOffset = (baseKnobRadius * ringPadding) * config->gaugeScale;
-		bool hovered = index == hoveredIndex;
-		bool clicked = index == clickedIndex;
+		float centerOffset = (baseKnobRadius * ringPadding) * currentPage->gaugeScale;
+		bool hovered = knob.index == hoveredIndex;
+		bool clicked = knob.index == clickedIndex;
 		glm::vec4 color = hovered && (clicked || clickedIndex == -1) ? red : white;
 		float clickScaleFactor = clicked && hovered ? clickScale : 1;
 
-		glm::vec3 center = config->centers->at(index) - glm::vec3(0, centerOffset * clickScaleFactor, 0);
-		center *= config->aspectCorrection;
-		appendNumberQuad(mesh, index, color, center, numberSize * clickScaleFactor);
+		glm::vec3 center = knob.center - glm::vec3(0, centerOffset * clickScaleFactor, 0);
+		center *= currentPage->aspectCorrection;
+		appendNumberQuad(mesh, knob.index, color, center, numberSize * clickScaleFactor);
 	}
 
 	mesh->apply();
@@ -193,9 +197,9 @@ void KnobMonitor::generateNumbers(Mesh* mesh)
 void KnobMonitor::generateGauges(Mesh* mesh)
 {
 	mesh->clear();
-	for (int i = 0; i < config->centers->size(); i++)
+	for (auto knob : *currentPage->knobs)
 	{
-		appendGauge(gaugeMesh, i, config->centers->at(i), config->gaugeScale);
+		appendGauge(gaugeMesh, knob.index, knob.center, currentPage->gaugeScale);
 	}
 	mesh->apply();
 }
@@ -203,9 +207,9 @@ void KnobMonitor::generateGauges(Mesh* mesh)
 void KnobMonitor::generateDials(Mesh* mesh)
 {
 	dialMesh->clear();
-	for (int i = 0; i < config->centers->size(); i++)
+	for (auto knob : *currentPage->knobs)
 	{
-		appendDial(dialMesh, i, config->centers->at(i), config->gaugeScale, Knobs::get(i));
+		appendDial(dialMesh, knob.index, knob.center, currentPage->gaugeScale, Knobs::get(knob.index));
 	}
 	dialMesh->apply();
 }
@@ -282,12 +286,12 @@ void KnobMonitor::appendArc(Mesh* mesh, glm::vec4 startColor, glm::vec4 endColor
 			glm::cos(angle) * (radius - width / 2) + center.x,
 			glm::sin(angle) * (radius - width / 2) + center.y,
 			center.z
-		) * config->aspectCorrection);
+		) * currentPage->aspectCorrection);
 		mesh->vertices.push_back(glm::vec3(
 			glm::cos(angle) * (radius + width / 2) + center.x,
 			glm::sin(angle) * (radius + width / 2) + center.y,
 			center.z
-		) * config->aspectCorrection);
+		) * currentPage->aspectCorrection);
 
 		float colorInterpolant = (float)i / (resolution - 1);
 		mesh->colors.push_back(glm::mix(startColor, endColor, colorInterpolant));
@@ -300,15 +304,15 @@ void KnobMonitor::appendArc(Mesh* mesh, glm::vec4 startColor, glm::vec4 endColor
 
 void KnobMonitor::appendLine(Mesh* mesh, glm::vec4 startColor, glm::vec4 endColor, glm::vec3 start, glm::vec3 end, float width)
 {
-	glm::vec3 lineWidth = glm::vec3(width / 2, width / 2, 0) * config->aspectCorrection;
+	glm::vec3 lineWidth = glm::vec3(width / 2, width / 2, 0) * currentPage->aspectCorrection;
 
 
 	glm::vec2 segment = end - start;
 	glm::vec2 direction = glm::normalize(segment);
 	glm::vec3 ortho = glm::vec3(-direction.y, direction.x, 0) * lineWidth;
 
-	start *= config->aspectCorrection;
-	end   *= config->aspectCorrection;
+	start *= currentPage->aspectCorrection;
+	end   *= currentPage->aspectCorrection;
 
 	int startIndex = static_cast<int>(mesh->vertices.size());
 	mesh->indices.push_back(startIndex + 0);
@@ -363,10 +367,10 @@ void KnobMonitor::appendNumberQuad(Mesh* mesh, int index, glm::vec4 color, glm::
 	mesh->indices.push_back(startIndex + 1);
 	mesh->indices.push_back(startIndex + 2);
 
-	mesh->vertices.push_back(center + glm::vec3(-scale, -scale, 0) * config->aspectCorrection);
-	mesh->vertices.push_back(center + glm::vec3(-scale,  scale, 0) * config->aspectCorrection);
-	mesh->vertices.push_back(center + glm::vec3( scale,  scale, 0) * config->aspectCorrection);
-	mesh->vertices.push_back(center + glm::vec3( scale, -scale, 0) * config->aspectCorrection);
+	mesh->vertices.push_back(center + glm::vec3(-scale, -scale, 0) * currentPage->aspectCorrection);
+	mesh->vertices.push_back(center + glm::vec3(-scale,  scale, 0) * currentPage->aspectCorrection);
+	mesh->vertices.push_back(center + glm::vec3( scale,  scale, 0) * currentPage->aspectCorrection);
+	mesh->vertices.push_back(center + glm::vec3( scale, -scale, 0) * currentPage->aspectCorrection);
 
 	mesh->colors.push_back(color);
 	mesh->colors.push_back(color);

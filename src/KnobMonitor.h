@@ -13,14 +13,15 @@
 class KnobMonitor
 {
 public:
-	KnobMonitor(KnobConfig::Config* config, GLFWwindow* window);
+	KnobMonitor(KnobConfig* config, GLFWwindow* window);
 	~KnobMonitor();
 
 	void update();
 	void draw();
 
 private:
-	KnobConfig::Config* config;
+	KnobConfig* config;
+	KnobConfig::Page* currentPage;
 	GLFWwindow* window;
 
 	glm::vec4 red   = glm::vec4(0.9, 0.1, 0.15, 1);

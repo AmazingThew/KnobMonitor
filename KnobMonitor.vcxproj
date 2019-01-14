@@ -121,6 +121,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Config.cpp" />
     <ClCompile Include="src\Mesh.cpp" />
     <ClCompile Include="src\KnobMonitor.cpp" />
     <ClCompile Include="src\GLError.cpp" />
