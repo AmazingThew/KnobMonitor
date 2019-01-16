@@ -151,6 +151,12 @@
     <None Include="shaders\basic.vert" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="assets\Icon.png" />
+    <Image Include="assets\icon\Icon128.png" />
+    <Image Include="assets\icon\Icon16.png" />
+    <Image Include="assets\icon\Icon256.png" />
+    <Image Include="assets\icon\Icon32.png" />
+    <Image Include="assets\icon\Icon64.png" />
     <Image Include="assets\Numbers.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

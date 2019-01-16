@@ -1,3 +1,5 @@
+#pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h> // GLFW helper library
 #include <stdio.h>
@@ -5,6 +7,7 @@
 #include "Config.h"
 #include "KnobMonitor.h"
 #include "Knobs.h"
+#include "Utils/stb_image.h"
 
 #define BASE_RESOLUTION 700
 
@@ -33,6 +36,67 @@ void change_aspect(KnobConfig* config, GLFWwindow* window)
 	glfwSetWindowSize(window, width, height);
 	glfwSetWindowAspectRatio(window, width, height);
 
+}
+
+void load_icons(GLFWwindow* window)
+{
+	GLFWimage icons[5];
+
+	int iconWidth, iconHeight, iconChannels;
+		
+	unsigned char *iconData256 = stbi_load("./assets/icon/Icon256.png", &iconWidth, &iconHeight, &iconChannels, 4);
+	icons[0] = GLFWimage {
+		iconWidth,
+		iconHeight,
+		iconData256,
+	};
+
+	unsigned char *iconData128 = stbi_load("./assets/icon/Icon128.png", &iconWidth, &iconHeight, &iconChannels, 4);
+	icons[1] = GLFWimage{
+		iconWidth,
+		iconHeight,
+		iconData128,
+	};
+
+	unsigned char *iconData64  = stbi_load("./assets/icon/Icon64.png", &iconWidth, &iconHeight, &iconChannels, 4);
+	icons[2] = GLFWimage{
+		iconWidth,
+		iconHeight,
+		iconData64,
+	};
+
+	unsigned char *iconData32  = stbi_load("./assets/icon/Icon32.png", &iconWidth, &iconHeight, &iconChannels, 4);
+	icons[3] = GLFWimage{
+		iconWidth,
+		iconHeight,
+		iconData32,
+	};
+
+	unsigned char *iconData16  = stbi_load("./assets/icon/Icon16.png", &iconWidth, &iconHeight, &iconChannels, 4);
+	icons[4] = GLFWimage{
+		iconWidth,
+		iconHeight,
+		iconData16,
+	};
+
+	glfwSetWindowIcon(window, 5, icons);
+
+	stbi_image_free(iconData256);
+	stbi_image_free(iconData128);
+	stbi_image_free(iconData64);
+	stbi_image_free(iconData32);
+	stbi_image_free(iconData16);
+}
+
+void load_icon(std::string path)
+{
+	int iconWidth, iconHeight, iconChannels;
+	unsigned char *iconData = stbi_load("./assets/Icon.png", &iconWidth, &iconHeight, &iconChannels, 4);
+	GLFWimage icon = {
+		iconWidth,
+		iconHeight,
+		iconData
+	};
 }
 
 int main() {
@@ -74,6 +138,7 @@ int main() {
 		return -1;
 	}
 
+	load_icons(window);
 
 	// INITIALIZE
 	input = new Input(window);

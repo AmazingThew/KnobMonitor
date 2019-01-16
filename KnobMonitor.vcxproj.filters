@@ -84,5 +84,23 @@
     <Image Include="assets\Numbers.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="assets\Icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\icon\Icon16.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\icon\Icon32.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\icon\Icon64.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\icon\Icon128.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\icon\Icon256.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

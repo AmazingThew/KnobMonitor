@@ -254,7 +254,7 @@ void KnobMonitor::appendDial(Mesh* mesh, int index, glm::vec3 center, float scal
 
 	float radius = baseKnobRadius * scale;
 	float width = baseDialWidth * scale;
-	float circleWidth = 0.005f;
+	float circleWidth = arcWidth;
 
 	appendArc(mesh, dialColor, dialColor, center, radius, width, resolution, -PI / 2 - deadSplit / 2, -(PI2 - deadSplit) * progress);
 	appendArc(mesh, hubColor, hubColor, center, glm::mix(width / 2, radius - width*ringPadding, progress), circleWidth, resolution, 0, PI2);
