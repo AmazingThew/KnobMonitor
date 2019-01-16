@@ -71,6 +71,9 @@
     <ClInclude Include="include\Utils\stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\basic.frag" />
@@ -82,9 +85,6 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\Numbers.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="assets\Icon.png">
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="assets\icon\Icon16.png">
@@ -102,5 +102,13 @@
     <Image Include="assets\icon\Icon256.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="icon.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="KnobMonitor.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

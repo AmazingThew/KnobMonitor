@@ -132,6 +132,7 @@
     <ClCompile Include="include\Utils\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="resource.h" />
     <ClInclude Include="src\Input.h" />
     <ClInclude Include="src\Clipboard.h" />
     <ClInclude Include="include\Utils\json.hpp" />
@@ -151,13 +152,16 @@
     <None Include="shaders\basic.vert" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="assets\Icon.png" />
     <Image Include="assets\icon\Icon128.png" />
     <Image Include="assets\icon\Icon16.png" />
     <Image Include="assets\icon\Icon256.png" />
     <Image Include="assets\icon\Icon32.png" />
     <Image Include="assets\icon\Icon64.png" />
     <Image Include="assets\Numbers.png" />
+    <Image Include="icon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="KnobMonitor.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
