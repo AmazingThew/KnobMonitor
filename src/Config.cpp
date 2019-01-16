@@ -15,6 +15,7 @@ KnobConfig::KnobConfig()
 		std::vector<glm::vec2> knobGridCoords;
 		std::vector<int> knobIndices;
 		std::vector<glm::vec3> knobCenters;
+		std::vector<glm::vec2> knobNormalizedGridPositions;
 
 
 		int y = 0;
@@ -65,6 +66,7 @@ KnobConfig::KnobConfig()
 		{
 			glm::vec2 normalizedGridPosition = gridCoord / glm::max(extents, glm::vec2(1));
 			normalizedGridPosition = glm::vec2(normalizedGridPosition.x, 1 - normalizedGridPosition.y); // Hilarious Y flip
+			knobNormalizedGridPositions.push_back(normalizedGridPosition);
 			knobCenters.push_back(glm::vec3(glm::mix(minCenter, maxCenter, normalizedGridPosition) * 2.0f - 1.0f, 0) / aspectCorrection);
 		}
 
@@ -72,12 +74,14 @@ KnobConfig::KnobConfig()
 		{
 			knobs->push_back(Knob {
 				knobIndices[i],
-				knobCenters[i]
+				knobCenters[i],
+				knobNormalizedGridPositions[i],
 			});
 		}
 
 		pages.push_back(Page {
 			knobs,
+			knobsOnPage,
 			extents,
 			gaugeDiameter,
 			gaugeScale,

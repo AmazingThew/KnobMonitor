@@ -74,6 +74,8 @@ void KnobMonitor::update()
 			clickedIndex = -1;
 		}
 	}
+
+	accentHueBase = glm::fract(accentHueBase + hueShiftPerTick);
 	
 	generateDials(dialMesh);
 	generateGauges(gaugeMesh);
@@ -176,10 +178,12 @@ void KnobMonitor::generateNumbers(Mesh* mesh)
 
 	for (auto knob : *currentPage->knobs)
 	{
+		glm::vec4 accentColor = getAccentColor(knob);
+
 		float centerOffset = (baseKnobRadius * ringPadding) * currentPage->gaugeScale;
 		bool hovered = knob.index == hoveredIndex;
 		bool clicked = knob.index == clickedIndex;
-		glm::vec4 color = hovered && (clicked || clickedIndex == -1) ? red : white;
+		glm::vec4 color = hovered && (clicked || clickedIndex == -1) ? accentColor : white;
 		float clickScaleFactor = clicked && hovered ? clickScale : 1;
 
 		glm::vec3 center = knob.center - glm::vec3(0, centerOffset * clickScaleFactor, 0);
@@ -195,7 +199,7 @@ void KnobMonitor::generateGauges(Mesh* mesh)
 	mesh->clear();
 	for (auto knob : *currentPage->knobs)
 	{
-		appendGauge(gaugeMesh, knob.index, knob.center, currentPage->gaugeScale);
+		appendGauge(gaugeMesh, knob, currentPage->gaugeScale);
 	}
 	mesh->apply();
 }
@@ -205,16 +209,21 @@ void KnobMonitor::generateDials(Mesh* mesh)
 	dialMesh->clear();
 	for (auto knob : *currentPage->knobs)
 	{
-		appendDial(dialMesh, knob.index, knob.center, currentPage->gaugeScale, Knobs::get(knob.index));
+		appendDial(dialMesh, knob, currentPage->gaugeScale);
 	}
 	dialMesh->apply();
 }
 
-void KnobMonitor::appendGauge(Mesh* mesh, int index, glm::vec3 center, float scale)
+void KnobMonitor::appendGauge(Mesh* mesh, KnobConfig::Knob knob, float scale)
 {
+	int index = knob.index;
+	glm::vec3 center = knob.center;
+
+	glm::vec4 accentColor = getAccentColor(knob);
+
 	bool hovered = index == hoveredIndex;
 	bool clicked = index == clickedIndex;
-	glm::vec4 color = hovered && (clicked || clickedIndex == -1) ? red : white;
+	glm::vec4 color = hovered && (clicked || clickedIndex == -1) ? accentColor : white;
 	scale *= clicked && hovered ? clickScale : 1;
 
 
@@ -243,20 +252,26 @@ void KnobMonitor::appendGauge(Mesh* mesh, int index, glm::vec3 center, float sca
 	// appendArc(mesh, red, red, center, scale, thinTickWidth, 64, 0, PI2);
 }
 
-void KnobMonitor::appendDial(Mesh* mesh, int index, glm::vec3 center, float scale, float progress)
+void KnobMonitor::appendDial(Mesh* mesh, KnobConfig::Knob knob, float scale)
 {
+	int index = knob.index;
+	glm::vec3 center = knob.center;
+	float progress = Knobs::get(knob.index);
+
+	glm::vec4 accentColor0 = getAccentColor(knob);
+	glm::vec4 accentColor1 = getAccentColor(knob, dialGradientShift);
+
 	bool hovered = index == hoveredIndex;
 	bool clicked = index == clickedIndex;
 	scale *= clicked && hovered ? clickScale : 1;
 
-	glm::vec4 dialColor = red;
-	glm::vec4 hubColor = hovered && (clicked || clickedIndex == -1) ? red : white;;
+	glm::vec4 hubColor = hovered && (clicked || clickedIndex == -1) ? accentColor0 : white;;
 
 	float radius = baseKnobRadius * scale;
 	float width = baseDialWidth * scale;
 	float circleWidth = arcWidth;
 
-	appendArc(mesh, dialColor, dialColor, center, radius, width, resolution, -PI / 2 - deadSplit / 2, -(PI2 - deadSplit) * progress);
+	appendArc(mesh, accentColor0, accentColor1, center, radius, width, resolution, -PI / 2 - deadSplit / 2, -(PI2 - deadSplit) * progress);
 	appendArc(mesh, hubColor, hubColor, center, glm::mix(width / 2, radius - width*ringPadding, progress), circleWidth, resolution, 0, PI2);
 }
 
@@ -377,4 +392,12 @@ void KnobMonitor::appendNumberQuad(Mesh* mesh, int index, glm::vec4 color, glm::
 	mesh->uvs.push_back(glm::vec2(left, up));
 	mesh->uvs.push_back(glm::vec2(right, up));
 	mesh->uvs.push_back(glm::vec2(right, down));
+}
+
+glm::vec4 KnobMonitor::getAccentColor(KnobConfig::Knob knob, float additionalShift)
+{
+	float pageShift = config->currentPageIndex * PI;
+	glm::vec2 position = knob.normalizedGridPosition;
+	float hue = glm::fract(accentHueBase + hueShift * position.y + (1-position.x) * horizontalHueFactor - additionalShift + pageShift);
+	return glm::vec4(hsv2rgb(glm::vec3(hue, accentSat, accentVal)), 1);
 }

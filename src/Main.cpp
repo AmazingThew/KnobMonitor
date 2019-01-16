@@ -152,7 +152,7 @@ int main() {
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		glClearColor(0.08f, 0.15f, 0.22f, 1.0f);
+		glClearColor(0.0471200980f, 0.118134134f, 0.149606302f, 1);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		input->update();

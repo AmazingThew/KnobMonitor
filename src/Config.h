@@ -17,11 +17,13 @@ public:
 	{
 		int index;
 		glm::vec3 center;
+		glm::vec2 normalizedGridPosition;
 	};
 
 	struct Page
 	{
 		std::shared_ptr<std::vector<Knob>> knobs;
+		int numKnobs;
 		glm::vec2 extents;
 		glm::vec2 gaugeDiameter;
 		float gaugeScale;
