@@ -144,20 +144,40 @@
     <ClInclude Include="include\Utils\stb_image.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="assets\basic.frag" />
-    <None Include="assets\basic.vert" />
-    <None Include="assets\textured.frag" />
-    <None Include="config.json" />
+    <None Include="assets\basic.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="assets\basic.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="assets\textured.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="config.json">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="shaders\basic.frag" />
     <None Include="shaders\basic.vert" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="assets\icon\Icon128.png" />
-    <Image Include="assets\icon\Icon16.png" />
-    <Image Include="assets\icon\Icon256.png" />
-    <Image Include="assets\icon\Icon32.png" />
-    <Image Include="assets\icon\Icon64.png" />
-    <Image Include="assets\Numbers.png" />
+    <Image Include="assets\icon\Icon128.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="assets\icon\Icon16.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="assets\icon\Icon256.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="assets\icon\Icon32.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="assets\icon\Icon64.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="assets\Numbers.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
     <Image Include="icon.ico" />
   </ItemGroup>
   <ItemGroup>
