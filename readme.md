@@ -13,6 +13,7 @@ Knob Monitor is a Windows-native GUI frontend, which shows the controller state 
 - With Knob Monitor running, simply click on the desired knob in the GUI and its value will be copied to your clipboard
 
 # SETUP:
+[Grab the release binary](https://github.com/AmazingThew/KnobMonitor/releases/download/v1.0/KnobMonitor-v1.0.zip) because compiling C++ yourself is for psychopaths.
 You'll need to edit config.json to describe the layout of your MIDI controller. Each element in the KnobPages list describes the positions and indices of all the knobs that you want to see on one screen.
 Typically, if your controller has multiple banks, or you have connected multiple controllers, each bank or controller would get its own page (pages do not need to have the same shape or number of knobs)
 Each page consists of a list of rows of knobs. Each row entry is the index of the knob you want to appear onscreen (these are the indices you configured in Knob Sock).
