@@ -1,7 +1,7 @@
 # KNOB MONITOR
 ## GUI frontend for [Knob Sock](https://github.com/AmazingThew/KnobSock)
 
-![the konbs with the arcade feeling](https://i.imgur.com/jTSTjLn.gif)
+![the konbs with the arcade feeling](https://i.imgur.com/mV7Il6D.png)
 
 Knob Sock is a lightweight tool to send MIDI knob data over sockets, typically to aid in tuning values for gamedev/creative-code projects.
 Knob Monitor is a Windows-native GUI frontend, which shows the controller state and allows easy access to knob values.
@@ -29,6 +29,7 @@ The elements on each page are laid out as you see them visually. For example:
 }
 ```
 would appear thusly:
+
 ![the picture for eight konbs](https://i.imgur.com/iG7UF9P.png)
 
 # CONTROLS:
